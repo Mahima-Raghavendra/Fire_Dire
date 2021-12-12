@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
         firebase_auth.signOut();
+        finishAffinity();
+        System.exit(0);
     }
 }
