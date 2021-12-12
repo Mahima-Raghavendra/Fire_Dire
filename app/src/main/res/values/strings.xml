@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Fire Dire</string>
+    <string name="reset_pwd">Send reset link</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="login">Login</string>
+</resources>

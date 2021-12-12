@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "984993794019",
+    "firebase_url": "https://fire-dire-default-rtdb.firebaseio.com",
+    "project_id": "fire-dire",
+    "storage_bucket": "fire-dire.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984993794019:android:c5387d63e3a65e9966c2d6",
+        "android_client_info": {
+          "package_name": "com.example.fire_dire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984993794019-6bvmhbuo2pem34fc78jjnd8vk8fabpq5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZAeU4riJ5t-NYbSv-MN-3PV8zTc37U_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "984993794019-6bvmhbuo2pem34fc78jjnd8vk8fabpq5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
