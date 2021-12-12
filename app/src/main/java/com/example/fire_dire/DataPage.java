@@ -16,6 +16,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
@@ -36,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,18 +72,13 @@ public class DataPage extends AppCompatActivity {
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pdf_image);
         scaledbmp = Bitmap.createScaledBitmap(bmp, 1200, 518, false);
 
-//        if(!dataSetsNumber.getText().toString().equals("")){
-//            given_count=Integer.parseInt(dataSetsNumber.getText().toString());
-//        }
-//        else{
-//            given_count =2;
-//        }
-
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dataList = new ArrayList<>();
         adapter = new RecyclerAdapter(dataList);
         recyclerView.setAdapter(adapter);
+
+        ActivityCompat.requestPermissions(DataPage.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
 
         getData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,80 +117,141 @@ public class DataPage extends AppCompatActivity {
                 catch (NumberFormatException e){
                     Toast.makeText(DataPage.this, "Provide valid number!", Toast.LENGTH_SHORT).show();
                 }
-
-
-        ActivityCompat.requestPermissions(DataPage.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-        createPDF();
             }
         });
-    }
-    private void createPDF() {
+
         generatePDF.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                PdfDocument document = new PdfDocument();
-                final Paint paint = new Paint();
-                Paint titlePaint = new Paint();
-
-                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(1200, 2010, 1).create();
-                PdfDocument.Page page = document.startPage(pageInfo);
-
-                final Canvas canvas = page.getCanvas();
-                canvas.drawBitmap(scaledbmp,0,0, paint);
-                titlePaint.setTextAlign(Paint.Align.CENTER);
-                titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                titlePaint.setTextSize(70);
-                canvas.drawText("Temperature Data",pageWidth/2, 270, titlePaint);
-
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(2);
-                canvas.drawRect(20,780,pageWidth-20,860,paint);
-
-                paint.setTextAlign(Paint.Align.LEFT);
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawText("Date", 40, 830, paint);
-                canvas.drawText("Time", 500, 830, paint);
-                canvas.drawText("Temperature", 800, 830, paint);
-
-                canvas.drawLine(480, 790, 480, 850, paint);
-                canvas.drawLine(780, 790, 780, 850, paint);
-
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int y = 950;
-                        if(snapshot.exists()){
-                            for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                                y+=80;
-                                canvas.drawText((String) dataSnapshot.child("co2").getValue(), 40, y, paint);
-                                canvas.drawText((String) dataSnapshot.child("smoke").getValue(), 500, y, paint);
-                                canvas.drawText((String) dataSnapshot.child("latitude").getValue(), 800, y, paint);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-
-                document.finishPage(page);
-
-                File file = new File(Environment.getExternalStorageDirectory(),"/Hello.pdf");
-                try{
-                    document.writeTo(new FileOutputStream(file));
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
-                document.close();
+            public void onClick(View view) {
+                createPDF();
             }
         });
     }
 
-    private void Logout(){
+    private void createPDF(){
+        runOnUiThread(new Runnable(){
+            public void run() {
+                int y_axis = 40;
+                int increment = 10;
 
+                PdfDocument myPdfDocument = new PdfDocument();
+                Paint paint = new Paint();
+                Paint forLinePaint = new Paint();
+                PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(250, 350, 1).create();
+                PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
+                Canvas canvas = myPage.getCanvas();
+
+                paint.setTextSize(15.5f);
+                paint.setColor(Color.rgb(0, 50, 250));
+
+                canvas.drawText("Fire Dire", 20, 20, paint);
+
+                forLinePaint.setStyle(Paint.Style.STROKE);
+                forLinePaint.setPathEffect(new DashPathEffect(new float[]{5, 5},0));
+                forLinePaint.setStrokeWidth(2);
+                canvas.drawLine(20, 40, 230, 40,forLinePaint);
+                paint.setTextSize(8.5f);
+                for(DataList i: dataList){
+                    System.out.println(i.getCo2());
+                    y_axis = y_axis+increment;
+                    canvas.drawText("CO2: "+i.getCo2(), 20, y_axis, paint);
+                    y_axis = y_axis+increment;
+                    canvas.drawText("Latitude: "+i.getLatitude(),20, y_axis, paint);
+                    y_axis = y_axis+increment;
+                    canvas.drawText("Longitude: "+i.getLongitude(), 20, y_axis, paint);
+                    y_axis = y_axis+increment;
+                    canvas.drawText("Smoke: "+i.getSmoke(), 20, y_axis, paint);
+                    y_axis = y_axis+increment;
+                    canvas.drawText("Temperature: "+i.getTemperature(), 20, y_axis, paint);
+                    y_axis = y_axis+10;
+                    canvas.drawLine(20, y_axis, 230, y_axis,forLinePaint);
+                }
+
+                myPdfDocument.finishPage(myPage);
+//                File file = new File(this.getExternalFilesDir("/"), "FireDire.pdf");
+                File file = new File(Environment.getExternalStorageDirectory(),"/FireDire.pdf");
+
+                try{
+                    myPdfDocument.writeTo(new FileOutputStream(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                myPdfDocument.close();
+            }
+        });
+    }
+
+
+
+
+
+
+//    private void createPDF() {
+////        generatePDF.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View v) {
+//                PdfDocument document = new PdfDocument();
+//                final Paint paint = new Paint();
+//                Paint titlePaint = new Paint();
+//
+//                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(1200, 2010, 1).create();
+//                PdfDocument.Page page = document.startPage(pageInfo);
+//
+//                final Canvas canvas = page.getCanvas();
+//                canvas.drawBitmap(scaledbmp,0,0, paint);
+//                titlePaint.setTextAlign(Paint.Align.CENTER);
+//                titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+//                titlePaint.setTextSize(70);
+//                canvas.drawText("Temperature Data",pageWidth/2, 270, titlePaint);
+//
+//                paint.setStyle(Paint.Style.STROKE);
+//                paint.setStrokeWidth(2);
+//                canvas.drawRect(20,780,pageWidth-20,860,paint);
+//
+//                paint.setTextAlign(Paint.Align.LEFT);
+//                paint.setStyle(Paint.Style.FILL);
+//                canvas.drawText("Date", 40, 830, paint);
+//                canvas.drawText("Time", 500, 830, paint);
+//                canvas.drawText("Temperature", 800, 830, paint);
+//
+//                canvas.drawLine(480, 790, 480, 850, paint);
+//                canvas.drawLine(780, 790, 780, 850, paint);
+//
+//                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        int y = 950;
+//                        if(snapshot.exists()){
+//                            for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+//                                y+=80;
+//                                canvas.drawText((String) dataSnapshot.child("co2").getValue(), 40, y, paint);
+//                                canvas.drawText((String) dataSnapshot.child("smoke").getValue(), 500, y, paint);
+//                                canvas.drawText((String) dataSnapshot.child("latitude").getValue(), 800, y, paint);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//
+//
+//                document.finishPage(page);
+//
+//                File file = new File(Environment.getExternalStorageDirectory(),"/Hello.pdf");
+//                try{
+//                    document.writeTo(new FileOutputStream(file));
+//                }catch(IOException e){
+//                    e.printStackTrace();
+//                }
+//                document.close();
+//            }
+////        });
+////    }
+
+    private void alertBox(){
         AlertDialog.Builder builder =new AlertDialog.Builder(this);
 
         builder.setMessage("Are you sure you want to exit?")
@@ -216,45 +275,12 @@ public class DataPage extends AppCompatActivity {
         alertDialog.show();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.logoutMenu) {
-            Logout();
-        }
-
-        return super.onOptionsItemSelected(item);
+    private void Logout(){
+        alertBox();
     }
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder =new AlertDialog.Builder(this);
-
-        builder.setMessage("Are you sure you want to exit?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        firebaseAuth.signOut();
-                        Toast.makeText(DataPage.this, "You are logged out!", Toast.LENGTH_SHORT).show();
-                        finishAffinity();
-                        startActivity(new Intent(DataPage.this, MainActivity.class));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
+        alertBox();
     }
 }

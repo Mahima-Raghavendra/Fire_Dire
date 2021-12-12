@@ -39,12 +39,6 @@ public class MainActivity extends AppCompatActivity {
         forgot_pwd = findViewById(R.id.forgotPwd);
 
         FirebaseUser user = firebase_auth.getCurrentUser();
-
-//        if(user!=null){
-//            finish();
-//            startActivity(new Intent(MainActivity.this, DataPage.class));
-//        }
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
