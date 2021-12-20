@@ -52,9 +52,9 @@ public class DataPage extends AppCompatActivity {
     private RecyclerAdapter adapter;
     EditText dataSetsNumber;
     Button getData;
-    Button generatePDF;
-    Bitmap bmp, scaledbmp;
-    int pageWidth=1200;
+//    Button generatePDF;
+//    Bitmap bmp, scaledbmp;
+//    int pageWidth=1200;
     private int count = 0;
     int input_count =0;
 
@@ -66,11 +66,11 @@ public class DataPage extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getData = (Button) findViewById(R.id.getData);
-        generatePDF = (Button) findViewById(R.id.generatePDF);
+//        generatePDF = (Button) findViewById(R.id.generatePDF);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pdf_image);
-        scaledbmp = Bitmap.createScaledBitmap(bmp, 1200, 518, false);
+//        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pdf_image);
+//        scaledbmp = Bitmap.createScaledBitmap(bmp, 1200, 518, false);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -120,69 +120,66 @@ public class DataPage extends AppCompatActivity {
             }
         });
 
-        generatePDF.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createPDF();
-            }
-        });
+//        generatePDF.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                createPDF();
+//            }
+//        });
     }
 
-    private void createPDF(){
-        runOnUiThread(new Runnable(){
-            public void run() {
-                int y_axis = 40;
-                int increment = 10;
-
-                PdfDocument myPdfDocument = new PdfDocument();
-                Paint paint = new Paint();
-                Paint forLinePaint = new Paint();
-                PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(250, 350, 1).create();
-                PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
-                Canvas canvas = myPage.getCanvas();
-
-                paint.setTextSize(15.5f);
-                paint.setColor(Color.rgb(0, 50, 250));
-
-                canvas.drawText("Fire Dire", 20, 20, paint);
-
-                forLinePaint.setStyle(Paint.Style.STROKE);
-                forLinePaint.setPathEffect(new DashPathEffect(new float[]{5, 5},0));
-                forLinePaint.setStrokeWidth(2);
-                canvas.drawLine(20, 40, 230, 40,forLinePaint);
-                paint.setTextSize(8.5f);
-                for(DataList i: dataList){
-                    System.out.println(i.getCo2());
-                    y_axis = y_axis+increment;
-                    canvas.drawText("CO2: "+i.getCo2(), 20, y_axis, paint);
-                    y_axis = y_axis+increment;
-                    canvas.drawText("Latitude: "+i.getLatitude(),20, y_axis, paint);
-                    y_axis = y_axis+increment;
-                    canvas.drawText("Longitude: "+i.getLongitude(), 20, y_axis, paint);
-                    y_axis = y_axis+increment;
-                    canvas.drawText("Smoke: "+i.getSmoke(), 20, y_axis, paint);
-                    y_axis = y_axis+increment;
-                    canvas.drawText("Temperature: "+i.getTemperature(), 20, y_axis, paint);
-                    y_axis = y_axis+10;
-                    canvas.drawLine(20, y_axis, 230, y_axis,forLinePaint);
-                }
-
-                myPdfDocument.finishPage(myPage);
-//                File file = new File(this.getExternalFilesDir("/"), "FireDire.pdf");
-                File file = new File(Environment.getExternalStorageDirectory(),"/FireDire.pdf");
-
-                try{
-                    myPdfDocument.writeTo(new FileOutputStream(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                myPdfDocument.close();
-            }
-        });
-    }
-
-
-
+//    private void createPDF(){
+//        runOnUiThread(new Runnable(){
+//            public void run() {
+//                int y_axis = 40;
+//                int increment = 10;
+//
+//                PdfDocument myPdfDocument = new PdfDocument();
+//                Paint paint = new Paint();
+//                Paint forLinePaint = new Paint();
+//                PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(250, 350, 1).create();
+//                PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
+//                Canvas canvas = myPage.getCanvas();
+//
+//                paint.setTextSize(15.5f);
+//                paint.setColor(Color.rgb(0, 50, 250));
+//
+//                canvas.drawText("Fire Dire", 20, 20, paint);
+//
+//                forLinePaint.setStyle(Paint.Style.STROKE);
+//                forLinePaint.setPathEffect(new DashPathEffect(new float[]{5, 5},0));
+//                forLinePaint.setStrokeWidth(2);
+//                canvas.drawLine(20, 40, 230, 40,forLinePaint);
+//                paint.setTextSize(8.5f);
+//                for(DataList i: dataList){
+//                    System.out.println(i.getCo2());
+//                    y_axis = y_axis+increment;
+//                    canvas.drawText("CO2: "+i.getCo2(), 20, y_axis, paint);
+//                    y_axis = y_axis+increment;
+//                    canvas.drawText("Latitude: "+i.getLatitude(),20, y_axis, paint);
+//                    y_axis = y_axis+increment;
+//                    canvas.drawText("Longitude: "+i.getLongitude(), 20, y_axis, paint);
+//                    y_axis = y_axis+increment;
+//                    canvas.drawText("Smoke: "+i.getSmoke(), 20, y_axis, paint);
+//                    y_axis = y_axis+increment;
+//                    canvas.drawText("Temperature: "+i.getTemperature(), 20, y_axis, paint);
+//                    y_axis = y_axis+10;
+//                    canvas.drawLine(20, y_axis, 230, y_axis,forLinePaint);
+//                }
+//
+//                myPdfDocument.finishPage(myPage);
+////                File file = new File(this.getExternalFilesDir("/"), "FireDire.pdf");
+//                File file = new File(Environment.getExternalStorageDirectory(),"/FireDire.pdf");
+//
+//                try{
+//                    myPdfDocument.writeTo(new FileOutputStream(file));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                myPdfDocument.close();
+//            }
+//        });
+//    }
 
 
 
